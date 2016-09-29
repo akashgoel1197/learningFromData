@@ -1,0 +1,26 @@
+"""doing by montey carlo simulation"""
+import numpy as np
+import random
+
+itera = 10000
+
+bins = np.array([[0,1],[1,1]])
+FirstBlack = 0
+SecondBlack =0
+for i in range(itera):
+    bag = random.randint(0,1)
+    bag = bins[bag]
+    index =random.randint(0,len(bag)-1) 
+    ball = bag[index]
+    if(ball==1):
+        FirstBlack+=1
+        if(index==1):
+            ball2 = bag[0]
+        else:
+            ball2 = bag[1]
+        if(ball2 == 1):
+            SecondBlack+=1
+        
+       
+print "%.6f"%((1.0*SecondBlack)/FirstBlack) 
+
