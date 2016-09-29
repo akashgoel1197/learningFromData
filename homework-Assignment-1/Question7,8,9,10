@@ -1,0 +1,150 @@
+import random
+import numpy as np
+import time
+class point:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+    def getX(self):
+        return self.x
+    def getY(self):
+        return self.y
+    def setX(self,x):
+        self.x =x
+    def setY(self,y):
+        self.y = y
+"""Generate N Random points Given The Space""" 
+def randomPoints(N,space):
+    x = random.uniform(space[0],space[1])
+    y = random.uniform(space[0],space[1]) 
+    List = np.array([x,y])
+    for i in range(N-1):
+        x = random.uniform(space[0],space[1])
+        y = random.uniform(space[0],space[1]) 
+ 
+        List = np.vstack((List,np.array([x,y])))
+    return List
+
+"""given 2 points  return the y for all points"""
+def solve(p1,p2,x):
+    m = 1.0*(p2.getY()- p1.getY())/(p2.getX()-p1.getX())
+    b = p1.getY() - m * p1.getX()
+    
+    return m*x+b;
+
+##p1 = point(2,4)
+##p2 = point(3,9)
+##x = np.array([2,4])
+##print solve(p1,p2,x)
+
+def missclassifiedPoint(X,y,w):
+    L= np.dot(X,w)
+    L = signum(L)
+    List = []
+    i =0
+    for p in L:
+##        print p[0], y[i][0]
+        if p[0]!= y[i][0]:
+            List.append(i);
+        i+=1;
+    return List
+
+def PLA(X,y,w,maxiter,runmode):
+    cnt=0
+    nw = w
+##    print nw.shape
+    while(cnt<maxiter):
+        m = missclassifiedPoint(X,y,nw);
+##        print "###"
+##        print m
+        if(len(m)==0):
+            break
+        index = random.choice(m)
+##        print index
+        x =  np.reshape(X[index],(3,1))
+##        print "X:"
+##        print x
+        y_ = np.reshape(y[index],(1,1))
+##        print "Y_"
+##        print y_
+##        print y[index].shape
+##        print np.dot(x,y_)
+        nw += np.dot(x,y_)
+        cnt+=1
+##        print nw
+##        print "---------------"
+    if(not runmode):
+        return nw;
+    else:
+        return cnt;
+    
+def signum(X):
+    y = np.array([0])
+    for i in X:
+        if(i[0]>0):
+             y =np.vstack((y,np.array([1])))
+        else:
+             y = np.vstack((y,np.array([-1])))
+    return y[1:,:]
+
+
+def mainForQuestion7and9(N):
+    iter = 1000;
+    space = [-1,1];
+    dimension = 2
+    iterCount = np.zeros((iter,1))
+    for it in xrange(iter):
+        p1 = point(random.uniform(space[0],space[1]),random.uniform(space[0],space[1]))
+        p2 = point(random.uniform(space[0],space[1]),random.uniform(space[0],space[1]))
+        X = randomPoints(N,space)
+        y = signum(solve(p1,p2,X[:,:1])- X[:,1:2]) 
+        x_ = np.ones((N,1))
+        X = np.concatenate((x_,X),axis=1)
+##        X = np.concatenate((np.ones((N,1)) , X))
+##        print X.shape
+##        print X
+##        maxiter = 10000;
+        maxiter = 10000;
+        w = np.zeros((dimension+1,1))
+##        print w.shape
+##        print y.shape
+##        print X.shape
+        iterCount[it] = PLA(X,y,w,maxiter,1);
+##        time.sleep(30)
+    return iterCount
+##################################################################################
+""" --------------------------------------------------------------------------------"""
+def Eout(p1,p2,d,space,w,count):
+    X = randomPoints(count,space)
+    X = np.concatenate((np.ones((count,1)),X),axis=1)
+    y = signum(solve(p1,p2,X[:,1:2])-X[:,2:3])
+    hy = missclassifiedPoint(X,y,w)
+    return 1.0*len(hy)/count
+def mainForQuestion8and10(N):
+    iter = 1000;
+    space = [-1,1];
+    dimension = 2
+    prob = np.zeros((iter,1))
+    for it in xrange(iter):
+        p1 = point(random.uniform(space[0],space[1]),random.uniform(space[0],space[1]))
+        p2 = point(random.uniform(space[0],space[1]),random.uniform(space[0],space[1]))
+        X = randomPoints(N,space)
+        y = signum(solve(p1,p2,X[:,:1])- X[:,1:2]) 
+        x_ = np.ones((N,1))
+        X = np.concatenate((x_,X),axis=1)
+##        X = np.concatenate((np.ones((N,1)) , X))
+##        print X.shape
+##        print X
+##        maxiter = 10000;
+        maxiter = 10000;
+        w = np.zeros((dimension+1,1))
+##        print w.shape
+##        print y.shape
+##        print X.shape
+        w = PLA(X,y,w,maxiter,0);
+        prob[it] = Eout(p1,p2,dimension,space,w,1000);
+##        time.sleep(30)
+    return prob
+z=mainForQuestion8and10(100)
+print z
+print np.mean(z)
