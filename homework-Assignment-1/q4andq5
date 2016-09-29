@@ -1,0 +1,31 @@
+## QUESTION 4 and 5:
+""" Given:
+        prob of red = 0.55
+        prob of green = 0.45
+"""
+"""
+    find :
+    Question 4 : drawing one sample of 10 marbles prob of all being green 
+"""
+mu = 0.55
+NMarbels = 10
+ans=1.0
+for i in range(NMarbels):
+    ans = ans*(1-mu)
+
+#print ans
+
+"""QUestion 5:calcualte probability that at least one of samples has v =0."""
+## solution can be think as calculating sampels 1- prob(no samples has v=0)
+samples = 1000
+
+def probSampleHavingAtleastOneRED(proRED,sampleSize):
+    ans = 1.0
+    for i in xrange(sampleSize):
+        ans*=(1-mu)
+    return 1-ans
+ans = 1.0
+for i in xrange(samples):
+    ans*=probSampleHavingAtleastOneRED(0.55,10)
+
+print 1-ans
